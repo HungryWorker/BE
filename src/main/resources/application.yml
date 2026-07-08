@@ -1,0 +1,16 @@
+spring:
+  docker:
+    compose:
+      readiness:
+        timeout: 5m
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        format_sql: true
+    show-sql: true
+
+logging:
+  level:
+    org.hibernate.SQL: debug
