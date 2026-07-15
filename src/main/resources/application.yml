@@ -10,6 +10,26 @@ spring:
       hibernate:
         format_sql: true
     show-sql: true
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: ${GOOGLE_CLIENT_ID}
+            client-secret: ${GOOGLE_CLIENT_SECRET}
+            scope:
+              - email
+              - profile
+
+# HS256은 최소 32byte(256bit) 이상 시크릿이 필요합니다. 운영 환경에서는 반드시 JWT_SECRET 환경변수로 덮어쓰세요.
+jwt:
+  secret: ${JWT_SECRET}
+  expiration-ms: 604800000 # 7일
+
+app:
+  oauth2:
+    # 로그인 성공 후 토큰을 붙여 리다이렉트할 프론트엔드 주소
+    redirect-uri: ${FRONTEND_REDIRECT_URI:http://localhost:3000/oauth/callback}
 
 logging:
   level:

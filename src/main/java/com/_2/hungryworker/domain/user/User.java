@@ -12,11 +12,12 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.Nationalized;
 
 @Entity
 @Table(
-    name = "users",
-    uniqueConstraints = @UniqueConstraint(name = "uk_user_google_id", columnNames = "google_id")
+        name = "users",
+        uniqueConstraints = @UniqueConstraint(name = "uk_user_google_id", columnNames = "google_id")
 )
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -27,6 +28,7 @@ public class User extends BaseTimeEntity {
     @Column(name = "user_id")
     private Long id;
 
+    @Nationalized
     @Column(nullable = false, length = 50)
     private String nickname;
 
