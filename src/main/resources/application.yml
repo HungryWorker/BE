@@ -3,6 +3,13 @@ spring:
     compose:
       readiness:
         timeout: 5m
+
+  datasource:
+    url: jdbc:sqlserver://localhost:1433;encrypt=false;trustServerCertificate=true
+    username: sa
+    password: verYs3cret
+    driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver
+
   jpa:
     hibernate:
       ddl-auto: update
@@ -34,3 +41,7 @@ app:
 logging:
   level:
     org.hibernate.SQL: debug
+
+google:
+  maps:
+    api-key: ${GOOGLE_MAPS_API_KEY}
