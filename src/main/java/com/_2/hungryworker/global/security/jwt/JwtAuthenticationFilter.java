@@ -34,14 +34,27 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                                      FilterChain filterChain) throws ServletException, IOException {
         String token = resolveToken(request);
 
-        if (token != null && jwtTokenProvider.validateToken(token)) {
-            Long userId = jwtTokenProvider.getUserId(token);
+        if (token != null) {
+            System.out.println("===== JWT FILTER =====");
+            System.out.println("token exists = true");
+            System.out.println("token valid = " + jwtTokenProvider.validateToken(token));
 
-            UsernamePasswordAuthenticationToken authentication =
-                new UsernamePasswordAuthenticationToken(userId, null, List.of());
-            authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+            if (jwtTokenProvider.validateToken(token)) {
+                Long userId = jwtTokenProvider.getUserId(token);
+                System.out.println("userId = " + userId);
 
-            SecurityContextHolder.getContext().setAuthentication(authentication);
+                UsernamePasswordAuthenticationToken authentication =
+                        new UsernamePasswordAuthenticationToken(userId, null, List.of());
+
+                authentication.setDetails(
+                        new WebAuthenticationDetailsSource().buildDetails(request)
+                );
+
+                SecurityContextHolder.getContext().setAuthentication(authentication);
+
+                System.out.println("authenticated = "
+                        + SecurityContextHolder.getContext().getAuthentication().isAuthenticated());
+            }
         }
 
         filterChain.doFilter(request, response);
