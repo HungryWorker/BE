@@ -34,6 +34,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                                      FilterChain filterChain) throws ServletException, IOException {
         String token = resolveToken(request);
 
+        System.out.println("===== JWT REQUEST =====");
+        System.out.println("method = " + request.getMethod());
+        System.out.println("uri = " + request.getRequestURI());
+        System.out.println("token exists = " + (token != null));
+
         if (token != null) {
             System.out.println("===== JWT FILTER =====");
             System.out.println("token exists = true");

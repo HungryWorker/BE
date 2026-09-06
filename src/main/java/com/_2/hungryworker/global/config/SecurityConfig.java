@@ -43,11 +43,10 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 // REST API + JWT 조합이므로 세션을 만들지 않는다.
-                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                // 토큰이 없는 요청을 익명 인증(anonymous) 토큰으로 감싸지 않도록 비활성화한다.
-                // 이렇게 해야 인증이 필요한 API에 토큰 없이 접근했을 때 authenticated() 체크에서
-                // 정상적으로 걸러지고, 컨트롤러의 @AuthenticationPrincipal Long 이 익명 principal과
-                // 타입이 맞지 않아 500 에러가 나는 상황을 막을 수 있다.
+                .sessionManagement(session ->
+                        session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                )
+                // 토큰이 없는 요청을 익명 인증 토큰으로 감싸지 않는다.
                 .anonymous(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
@@ -56,19 +55,31 @@ public class SecurityConfig {
                                 "/oauth2/**",
                                 "/uploads/**"
                         ).permitAll()
-                        .requestMatchers(HttpMethod.GET,
+
+                        // CORS preflight 요청 허용
+                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+
+                        .requestMatchers(
+                                HttpMethod.GET,
+                                "/api/restaurants/nearby",
                                 "/api/restaurants/search",
                                 "/api/restaurants/*/reviews",
                                 "/api/restaurants/*/reviews/summary"
                         ).permitAll()
+
                         .anyRequest().authenticated()
                 )
                 .oauth2Login(oauth2 -> oauth2
-                        .userInfoEndpoint(userInfo -> userInfo.userService(customOAuth2UserService))
+                        .userInfoEndpoint(userInfo ->
+                                userInfo.userService(customOAuth2UserService)
+                        )
                         .successHandler(oAuth2AuthenticationSuccessHandler)
                         .failureHandler(oAuth2AuthenticationFailureHandler)
                 )
-                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+                .addFilterBefore(
+                        jwtAuthenticationFilter,
+                        UsernamePasswordAuthenticationFilter.class
+                );
 
         return http.build();
     }
@@ -76,14 +87,32 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        // TODO: 실제 프론트엔드 배포 도메인으로 교체하세요.
-        configuration.setAllowedOriginPatterns(List.of("http://localhost:*"));
-        configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
+
+        // React 개발 서버
+        configuration.setAllowedOriginPatterns(
+                List.of("http://localhost:*")
+        );
+
+        configuration.setAllowedMethods(List.of(
+                "GET",
+                "POST",
+                "PUT",
+                "PATCH",
+                "DELETE",
+                "OPTIONS"
+        ));
+
         configuration.setAllowedHeaders(List.of("*"));
         configuration.setAllowCredentials(true);
 
-        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/**", configuration);
+        UrlBasedCorsConfigurationSource source =
+                new UrlBasedCorsConfigurationSource();
+
+        source.registerCorsConfiguration(
+                "/**",
+                configuration
+        );
+
         return source;
     }
 }
