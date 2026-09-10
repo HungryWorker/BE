@@ -90,7 +90,10 @@ public class SecurityConfig {
 
         // React 개발 서버
         configuration.setAllowedOriginPatterns(
-                List.of("http://localhost:*")
+                List.of(
+                        "http://localhost:*",
+                        "https://hungryworker.vercel.app"
+                )
         );
 
         configuration.setAllowedMethods(List.of(
