@@ -4,15 +4,11 @@ spring:
       readiness:
         timeout: 5m
 
-server:
-  port: ${PORT:10000}
-
   datasource:
     url: ${DB_URL}
     username: ${DB_USERNAME}
     password: ${DB_PASSWORD}
     driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver
-
 
   jpa:
     hibernate:
@@ -21,6 +17,7 @@ server:
       hibernate:
         format_sql: true
     show-sql: true
+
   security:
     oauth2:
       client:
@@ -31,22 +28,23 @@ server:
             scope:
               - email
               - profile
+
   servlet:
     multipart:
       max-file-size: 10MB
       max-request-size: 30MB
 
-# HS256은 최소 32byte(256bit) 이상 시크릿이 필요합니다. 운영 환경에서는 반드시 JWT_SECRET 환경변수로 덮어쓰세요.
+server:
+  port: ${PORT:10000}
+
 jwt:
   secret: ${JWT_SECRET}
-  expiration-ms: 604800000 # 7일
+  expiration-ms: 604800000
 
 app:
   oauth2:
-    # 로그인 성공 후 토큰을 붙여 리다이렉트할 프론트엔드 주소
     redirect-uri: ${FRONTEND_REDIRECT_URI:http://localhost:3000/oauth/callback}
   upload:
-    # 리뷰 첨부 사진 등이 저장되는 로컬 디렉터리. "/uploads/**" 로 정적 서빙된다.
     dir: ${UPLOAD_DIR:uploads}
 
 logging:
